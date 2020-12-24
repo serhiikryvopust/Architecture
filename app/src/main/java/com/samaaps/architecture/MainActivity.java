@@ -8,10 +8,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
     Button btnLogin;
     EditText etLogin;
     EditText etPassword;
+    ArrayList<UserModel> users;
+    HashMap<Integer,UserModel> userTypes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
         etLogin = findViewById(R.id.etLogin);
         etPassword = findViewById(R.id.etPassword);
 
+        users = new Utils().getUsers();
+
         btnLogin.setOnClickListener(view -> {
-            if (checkLogin(etLogin.getText().toString()) && checkPassword(etPassword.getText().toString())) {
+            if (checkLogin(etLogin.getText().toString(),etPassword.getText().toString())) {
                 startActivity();
             } else {
                 Toast.makeText(this,"Логин или пароль не правильный", Toast.LENGTH_SHORT).show();
@@ -38,14 +46,10 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private boolean checkLogin(String login) {
-        for (int i = 0; i < Utils.logins.length; i++) {
-            if (Utils.logins[i].equals(login)) return true;
+    private boolean checkLogin(String login, String password) {
+        for (UserModel userModel : users ){
+            if (userModel.getLogin().equals(login) && userModel.getPassword().equals(password)) return true;
         }
         return false;
-    }
-
-    private boolean checkPassword(String password) {
-        return password.equals(Utils.password);
     }
 }
