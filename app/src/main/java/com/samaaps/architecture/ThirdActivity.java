@@ -1,8 +1,13 @@
 package com.samaaps.architecture;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -12,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ThirdActivity extends AppCompatActivity {
+    private static final int REQUEST_PHONE_CALL = 22222;
     private EditText etPhone;
     private Button btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnStar, btnDiez, btnCall, btnDel;
     private ArrayList<Button> buttons;
@@ -48,6 +54,14 @@ public class ThirdActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == REQUEST_PHONE_CALL){
+            call(etPhone.getText().toString());
+        }
+    }
+
     private void setClickListeners() {
         for (Button button : buttons) {
             button.setOnClickListener(v -> etPhone.setText(etPhone.getText().append(button.getText().toString())));
@@ -56,6 +70,11 @@ public class ThirdActivity extends AppCompatActivity {
 
     private void call(String phone) {
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone));
-        startActivity(intent);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_CALL);
+        } else {
+            startActivity(intent);
+        }
     }
 }
